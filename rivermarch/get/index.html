@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rivermarch: real-time strategy for iPhone, iPad and Android</title>
+<meta name="description" content="Raise a town, train an army and take the river. A real-time strategy game made for a touchscreen, on iPhone, iPad and Android.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://loopyduck.github.io/rivermarch/get/">
+<meta property="og:title" content="Rivermarch">
+<meta property="og:description" content="Raise a town, train an army and take the river. Real-time strategy for iPhone, iPad and Android.">
+<meta property="og:image" content="https://loopyduck.github.io/rivermarch/get/preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="rivermarch.png">
+<link rel="apple-touch-icon" href="rivermarch.png">
+<script>
+// The one link on Rivermarch's shared pictures and messages: an iPhone or iPad goes to the App Store, an Android
+// phone to Google Play. Anything else (a computer, an unrecognised phone) stays here and picks from the buttons.
+// While a store's address below is empty, nobody is sent there, and the page says the game is coming soon to it.
+var APP_STORE = "";
+var GOOGLE_PLAY = "";
+(function () {
+  var ua = navigator.userAgent || "";
+  var iPadOS = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;  // iPads report a Mac
+  if (APP_STORE && (/iPhone|iPad|iPod/.test(ua) || iPadOS)) location.replace(APP_STORE);
+  else if (GOOGLE_PLAY && /Android/.test(ua)) location.replace(GOOGLE_PLAY);
+})();
+</script>
+<style>
+:root { --bg: #0f1a1c; --panel: rgba(9, 14, 16, 0.78); --ink: #f1ede2; --muted: #b9bfb6; --gold: #f4cc6b;
+        --on-gold: #1a1406; --rule: rgba(244, 204, 107, 0.35); }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; min-height: 100%; }
+body { background: var(--bg) url("backdrop.jpg") center / cover fixed; color: var(--ink);
+       font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 27rem; margin: 0 auto; padding: 56px 16px 64px; text-align: center; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 22px; padding: 32px 22px 26px;
+        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+img { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); }
+h1 { font: 900 2.1rem/1.2 Georgia, "Times New Roman", serif; color: var(--gold); margin: 18px 0 2px; }
+.tagline { font: italic 1.05rem/1.4 Georgia, serif; color: var(--ink); margin: 0 0 16px; }
+p { color: var(--muted); margin: 0 0 24px; }
+.stores { display: flex; flex-direction: column; gap: 12px; }
+.store { display: block; padding: 14px 16px; border-radius: 14px; background: var(--gold); color: var(--on-gold);
+         font-weight: 700; text-decoration: none; }
+.soon { display: block; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--rule); color: var(--gold);
+        font-weight: 600; }
+.small { font-size: 0.85rem; margin: 14px 0 0; }
+.small a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+<div class="card">
+<img src="rivermarch.png" alt="">
+<h1>Rivermarch</h1>
+<div class="tagline" id="tagline">Real-time strategy for touch</div>
+<p id="about">Raise a town, train an army and take the river. Play online against players near your skill, or practise against the computer.</p>
+<div class="stores">
+<a class="store" id="ios" href="#" hidden>Download on the App Store</a>
+<span class="soon" id="ios-soon">Coming soon to the App Store</span>
+<a class="store" id="android" href="#" hidden>Get it on Google Play</a>
+<span class="soon" id="android-soon">Coming soon to Google Play</span>
+</div>
+<p class="small" id="devices">For iPhone, iPad and Android.</p>
+<p class="small"><a href="../ios/support.html">Support</a> · <a href="../ios/privacy-policy.html">Privacy</a></p>
+</div>
+</main>
+<script>
+// In the visitor's own language, when it's one the game speaks.
+var words = {
+  vi: ["Chiến thuật thời gian thực", "Xây làng, luyện quân và chiếm lấy dòng sông. Đấu trực tuyến với người chơi cùng trình độ, hoặc luyện tập với máy.",
+       "Tải trên App Store", "Sắp có trên App Store", "Tải trên Google Play", "Sắp có trên Google Play", "Dành cho iPhone, iPad và Android."],
+  zh: ["为触屏打造的即时战略游戏", "建起城镇，训练军队，夺下大河。在线挑战积分相近的玩家，或与电脑切磋练习。",
+       "在 App Store 下载", "即将登陆 App Store", "在 Google Play 下载", "即将登陆 Google Play", "适用于 iPhone、iPad 和 Android。"],
+  es: ["Estrategia en tiempo real", "Levanta una aldea, entrena un ejército y conquista el río. Juega en línea contra rivales de tu nivel o practica contra la máquina.",
+       "Descargar en el App Store", "Muy pronto en el App Store", "Disponible en Google Play", "Muy pronto en Google Play", "Para iPhone, iPad y Android."],
+  fr: ["Stratégie en temps réel", "Bâtis un village, forme une armée et prends la rivière. Affronte en ligne des joueurs de ton niveau, ou entraîne-toi contre l'ordinateur.",
+       "Télécharger dans l'App Store", "Bientôt sur l'App Store", "Disponible sur Google Play", "Bientôt sur Google Play", "Pour iPhone, iPad et Android."],
+  de: ["Echtzeitstrategie für Touch", "Bau eine Stadt, bilde eine Armee aus und erobere den Fluss. Spiel online gegen Gleichstarke oder übe gegen den Computer.",
+       "Im App Store laden", "Bald im App Store", "Jetzt bei Google Play", "Bald bei Google Play", "Für iPhone, iPad und Android."]
+};
+var lang = (navigator.language || "en").toLowerCase().slice(0, 2);
+var w = words[lang];
+if (w) {
+  document.documentElement.lang = lang === "zh" ? "zh-Hans" : lang;
+  ["tagline", "about", "ios", "ios-soon", "android", "android-soon", "devices"].forEach(function (id, i) {
+    document.getElementById(id).textContent = w[i];
+  });
+}
+// Each store's button replaces its "coming soon" once its address is set above.
+[["ios", APP_STORE], ["android", GOOGLE_PLAY]].forEach(function (store) {
+  if (!store[1]) return;
+  var button = document.getElementById(store[0]);
+  button.href = store[1];
+  button.hidden = false;
+  document.getElementById(store[0] + "-soon").hidden = true;
+});
+</script>
+</body>
+</html>
