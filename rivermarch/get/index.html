@@ -19,7 +19,8 @@
 // The one link on Rivermarch's shared pictures and messages: an iPhone or iPad goes to the App Store, an Android
 // phone to Google Play. Anything else (a computer, an unrecognised phone) stays here and picks from the buttons.
 // While a store's address below is empty, nobody is sent there, and the page says the game is coming soon to it.
-var APP_STORE = "";
+// No country in the address, so each visitor lands in their own country's store.
+var APP_STORE = "https://apps.apple.com/app/rivermarch/id6829616963";
 var GOOGLE_PLAY = "";
 (function () {
   var ua = navigator.userAgent || "";
