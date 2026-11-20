@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flak Alley: fly low, hit hard, get home</title>
+<meta name="description" content="A ground-attack pilot's war, from the Libyan desert to the Rhine and across the Pacific. Bomb the target, dodge the flak, and beat your friends' scores. Play in your browser or on your phone.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://loopyduck.github.io/flak-alley/get/">
+<meta property="og:title" content="Flak Alley">
+<meta property="og:description" content="A ground-attack pilot's war, from the desert to the Rhine and across the Pacific. Can you beat my score?">
+<meta property="og:image" content="https://loopyduck.github.io/flak-alley/get/flak-alley.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="flak-alley.png">
+<link rel="apple-touch-icon" href="flak-alley.png">
+<script>
+// The one link on everything a Flak Alley player shares. An iPhone or iPad goes to the App Store and an Android phone
+// to Google Play, once those addresses are filled in below; until then, and on anything else, the visitor stays here
+// and can play in the browser. A challenge in the link (?c=operation.score.stars) is passed on to the browser game,
+// which then offers that raid to beat. A shared replay in the link (&r=<id>, kept on the game server) is offered to
+// watch: in the browser game, or in the app (flakalley://r/<id>) on a phone that has it. A phone is then not sent
+// straight on to its store, so the replay is not lost.
+//
+// The page speaks the visitor's language where the game does (the words are further down, copied from the game by
+// scripts/make-share-page.mjs), and tells the game server that it was opened: a count only, with nothing that says
+// who (server/counts.mjs). That call also wakes a sleeping server while the visitor is still reading.
+var APP_STORE = "";
+var GOOGLE_PLAY = "";
+var WEB_GAME = "https://flak-alley.onrender.com/";
+var challenge = (function () {
+  var c = new URLSearchParams(location.search).get("c") || "";
+  return /^[a-z-]{2,30}\.\d{1,7}\.[0-3]$/.test(c) ? c : "";
+})();
+var replay = (function () {
+  var r = new URLSearchParams(location.search).get("r") || "";
+  return /^[A-Za-z0-9]{10}$/.test(r) ? r : "";
+})();
+var ua = navigator.userAgent || "";
+var iOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);  // iPads report a Mac
+var android = /Android/.test(ua);
+(function () {
+  if (replay) return;
+  if (APP_STORE && iOS) location.replace(APP_STORE);
+  else if (GOOGLE_PLAY && android) location.replace(GOOGLE_PLAY);
+})();
+</script>
+<style>
+:root { --bg: #141b22; --panel: rgba(20, 27, 34, 0.9); --ink: #f3f1ea; --muted: #b6bcc2; --gold: #ffd24a;
+        --on-gold: #1b2530; --red: #d8452f; --rule: rgba(255, 255, 255, 0.16); }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; min-height: 100%; }
+body { background: linear-gradient(#2a4a66, #141b22 70%); color: var(--ink);
+       font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 27rem; margin: 0 auto; padding: 56px 16px 64px; text-align: center; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 22px; padding: 32px 22px 26px; }
+img { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); }
+h1 { font: 900 2.1rem/1.2 system-ui, -apple-system, sans-serif; letter-spacing: 0.06em; color: var(--gold); margin: 18px 0 2px; }
+.tagline { font-style: italic; margin: 0 0 16px; }
+p { color: var(--muted); margin: 0 0 22px; }
+.dare { color: var(--ink); border: 1px solid var(--gold); border-radius: 14px; padding: 12px 14px; background: rgba(255, 210, 74, 0.08); }
+.stores { display: flex; flex-direction: column; gap: 12px; }
+.store { display: block; padding: 14px 16px; border-radius: 14px; background: var(--red); color: #fff;
+         font-weight: 700; text-decoration: none; }
+.store.plain { background: var(--gold); color: var(--on-gold); }
+.soon { display: block; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--rule); color: var(--muted); font-weight: 600; }
+.small { font-size: 0.85rem; margin: 14px 0 0; }
+</style>
+</head>
+<body>
+<main>
+<div class="card">
+<img src="flak-alley.png" alt="">
+<h1>FLAK ALLEY</h1>
+<div class="tagline" id="tagline">Fly low, hit hard, get home</div>
+<p class="dare" id="dare" hidden></p>
+<p id="blurb">A ground-attack pilot's war, from the Libyan desert to the Rhine and across the Pacific. Bomb the target, duck under the flak, and bring the aircraft back.</p>
+<div class="stores">
+<a class="store" id="watch" href="#" hidden>Watch the raid in your browser</a>
+<a class="store plain" id="app" href="#" hidden>Watch it in the Flak Alley app</a>
+<a class="store" id="web" href="#">Play now in your browser</a>
+<a class="store plain" id="ios" href="#" hidden>Download on the App Store</a>
+<span class="soon" id="ios-soon">Coming soon to the App Store</span>
+<a class="store plain" id="android" href="#" hidden>Get it on Google Play</a>
+<span class="soon" id="android-soon">Coming soon to Google Play</span>
+</div>
+<p class="small" id="small">Free to play. Nothing to install for the browser version.</p>
+</div>
+</main>
+<script>
+/*WORDS: written by scripts/make-share-page.mjs*/
+var WORDS = {
+ "en": {
+  "locale": "en-GB",
+  "title": "Flak Alley: fly low, hit hard, get home",
+  "tagline": "Fly low, hit hard, get home",
+  "blurb": "A ground-attack pilot's war, from the Libyan desert to the Rhine and across the Pacific. Bomb the target, duck under the flak, and bring the aircraft back.",
+  "watch": "Watch the raid in your browser",
+  "app": "Watch it in the Flak Alley app",
+  "play": "Play now in your browser",
+  "ios": "Download on the App Store",
+  "iosSoon": "Coming soon to the App Store",
+  "android": "Get it on Google Play",
+  "androidSoon": "Coming soon to Google Play",
+  "small": "Free to play. Nothing to install for the browser version.",
+  "dare": "A friend scored {score} on Operation {name}. Can you beat it?",
+  "dareWatch": "A friend scored {score} on Operation {name} in Flak Alley. Watch the raid, then try to beat it.",
+  "ops": {
+   "first-light": "First Light",
+   "dust-devil": "Dust Devil",
+   "iron-horse": "Iron Horse",
+   "dry-well": "Dry Well",
+   "breakwater": "Breakwater",
+   "olive-branch": "Olive Branch",
+   "ferry-run": "Ferry Run",
+   "switchback": "Switchback",
+   "long-shadow": "Long Shadow",
+   "strangle": "Tourniquet",
+   "roundhouse": "Roundhouse",
+   "dog-green": "Dog Green",
+   "diver": "Diver",
+   "hedgerow": "Hedgerow",
+   "ski-jump": "Ski Jump",
+   "crossroads": "Crossroads",
+   "broken-wing": "Broken Wing",
+   "corridor": "Low Country",
+   "last-bridge": "Last Bridge",
+   "black-gold": "Black Gold",
+   "cold-iron": "Cold Iron",
+   "ice-road": "Ice Road",
+   "river-rats": "Ferryman",
+   "iron-gate": "Iron Gate",
+   "pearl": "Battleship Row",
+   "shangri-la": "Shangri-La",
+   "five-minutes": "Five Minutes",
+   "cactus": "Cactus",
+   "caldera": "Caldera",
+   "black-sand": "Black Sand"
+  }
+ },
+ "vi": {
+  "locale": "vi-VN",
+  "title": "Flak Alley: bay thấp, đánh mạnh, trở về",
+  "tagline": "Bay thấp, đánh mạnh, trở về",
+  "blurb": "Cuộc chiến của một phi công cường kích, từ sa mạc Libya đến sông Rhine và qua Thái Bình Dương. Ném bom mục tiêu, luồn dưới lưới cao xạ và đưa máy bay trở về.",
+  "watch": "Xem phi vụ trên trình duyệt",
+  "app": "Xem trong ứng dụng Flak Alley",
+  "play": "Chơi ngay trên trình duyệt",
+  "ios": "Tải về trên App Store",
+  "iosSoon": "Sắp có trên App Store",
+  "android": "Tải trên Google Play",
+  "androidSoon": "Sắp có trên Google Play",
+  "small": "Chơi miễn phí. Bản trình duyệt không cần cài đặt.",
+  "dare": "Một người bạn đạt {score} điểm trong Chiến dịch {name}. Bạn có vượt được không?",
+  "dareWatch": "Một người bạn đạt {score} điểm trong Chiến dịch {name} ở Flak Alley. Xem phi vụ, rồi thử vượt điểm.",
+  "ops": {
+   "first-light": "Rạng Đông",
+   "dust-devil": "Lốc Cát",
+   "iron-horse": "Ngựa Sắt",
+   "dry-well": "Giếng Cạn",
+   "breakwater": "Đê Chắn Sóng",
+   "olive-branch": "Cành Ô-liu",
+   "ferry-run": "Chuyến Phà",
+   "switchback": "Đường Đèo",
+   "long-shadow": "Bóng Dài",
+   "strangle": "Garô",
+   "roundhouse": "Nhà Đầu Máy",
+   "dog-green": "Dog Green",
+   "diver": "Diver",
+   "hedgerow": "Bờ Giậu",
+   "ski-jump": "Dốc Nhảy",
+   "crossroads": "Ngã Tư",
+   "broken-wing": "Gãy Cánh",
+   "corridor": "Vùng Trũng",
+   "last-bridge": "Cây Cầu Cuối",
+   "black-gold": "Vàng Đen",
+   "cold-iron": "Thép Lạnh",
+   "ice-road": "Đường Băng Giá",
+   "river-rats": "Lái Đò",
+   "iron-gate": "Cổng Sắt",
+   "pearl": "Hàng Chiến Hạm",
+   "shangri-la": "Shangri-La",
+   "five-minutes": "Năm Phút",
+   "cactus": "Cactus",
+   "caldera": "Hõm Chảo",
+   "black-sand": "Cát Đen"
+  }
+ },
+ "zh": {
+  "locale": "zh-CN",
+  "title": "Flak Alley：低空突防，重拳出击，安全返航",
+  "tagline": "低空突防，重拳出击，安全返航",
+  "blurb": "一名对地攻击机飞行员的战争，从利比亚沙漠到莱茵河，再到太平洋。轰炸目标，躲过高射炮火，把飞机带回家。",
+  "watch": "在浏览器中观看这次空袭",
+  "app": "在 Flak Alley 应用中观看",
+  "play": "立即在浏览器中游玩",
+  "ios": "在 App Store 下载",
+  "iosSoon": "即将登陆 App Store",
+  "android": "在 Google Play 获取",
+  "androidSoon": "即将登陆 Google Play",
+  "small": "免费游玩。浏览器版无需安装。",
+  "dare": "一位好友在“{name}”行动中得了{score}分。你能超过吗？",
+  "dareWatch": "一位好友在 Flak Alley 的“{name}”行动中得了{score}分。观看这次空袭，然后试着超越它。",
+  "ops": {
+   "first-light": "曙光",
+   "dust-devil": "尘卷风",
+   "iron-horse": "铁马",
+   "dry-well": "枯井",
+   "breakwater": "防波堤",
+   "olive-branch": "橄榄枝",
+   "ferry-run": "渡运",
+   "switchback": "盘山道",
+   "long-shadow": "长影",
+   "strangle": "止血带",
+   "roundhouse": "机车库",
+   "dog-green": "道格绿区",
+   "diver": "潜水员",
+   "hedgerow": "树篱",
+   "ski-jump": "跳台",
+   "crossroads": "十字路口",
+   "broken-wing": "折翼",
+   "corridor": "低地",
+   "last-bridge": "最后一桥",
+   "black-gold": "黑金",
+   "cold-iron": "冷铁",
+   "ice-road": "冰路",
+   "river-rats": "摆渡人",
+   "iron-gate": "铁门",
+   "pearl": "战列舰街",
+   "shangri-la": "香格里拉",
+   "five-minutes": "五分钟",
+   "cactus": "仙人掌",
+   "caldera": "火山口",
+   "black-sand": "黑沙"
+  }
+ },
+ "es": {
+  "locale": "es-ES",
+  "title": "Flak Alley: vuela bajo, golpea fuerte, vuelve a casa",
+  "tagline": "Vuela bajo, golpea fuerte, vuelve a casa",
+  "blurb": "La guerra de un piloto de ataque a tierra, del desierto libio al Rin y a través del Pacífico. Bombardea el objetivo, pasa bajo los antiaéreos y trae el avión de vuelta.",
+  "watch": "Ver la incursión en tu navegador",
+  "app": "Verla en la app de Flak Alley",
+  "play": "Jugar ahora en tu navegador",
+  "ios": "Descargar en el App Store",
+  "iosSoon": "Próximamente en el App Store",
+  "android": "Disponible en Google Play",
+  "androidSoon": "Próximamente en Google Play",
+  "small": "Gratis. La versión de navegador no necesita instalación.",
+  "dare": "Un amigo ha hecho {score} en la Operación {name}. ¿Puedes superarlo?",
+  "dareWatch": "Un amigo ha hecho {score} en la Operación {name} en Flak Alley. Mira la incursión y luego intenta superarla.",
+  "ops": {
+   "first-light": "Primera Luz",
+   "dust-devil": "Remolino",
+   "iron-horse": "Caballo de Hierro",
+   "dry-well": "Pozo Seco",
+   "breakwater": "Rompeolas",
+   "olive-branch": "Rama de Olivo",
+   "ferry-run": "Travesía",
+   "switchback": "Zigzag",
+   "long-shadow": "Sombra Larga",
+   "strangle": "Torniquete",
+   "roundhouse": "Rotonda",
+   "dog-green": "Dog Green",
+   "diver": "Diver",
+   "hedgerow": "Seto",
+   "ski-jump": "Trampolín",
+   "crossroads": "Encrucijada",
+   "broken-wing": "Ala Rota",
+   "corridor": "Tierras Bajas",
+   "last-bridge": "Último Puente",
+   "black-gold": "Oro Negro",
+   "cold-iron": "Hierro Frío",
+   "ice-road": "Camino Helado",
+   "river-rats": "Barquero",
+   "iron-gate": "Puerta de Hierro",
+   "pearl": "Fila de Acorazados",
+   "shangri-la": "Shangri-La",
+   "five-minutes": "Cinco Minutos",
+   "cactus": "Cactus",
+   "caldera": "Caldera",
+   "black-sand": "Arena Negra"
+  }
+ },
+ "fr": {
+  "locale": "fr-FR",
+  "title": "Flak Alley : volez bas, frappez fort, rentrez",
+  "tagline": "Volez bas, frappez fort, rentrez",
+  "blurb": "La guerre d’un pilote d’attaque au sol, du désert libyen au Rhin et à travers le Pacifique. Bombardez la cible, passez sous la DCA et ramenez l’avion.",
+  "watch": "Voir le raid dans votre navigateur",
+  "app": "Le voir dans l’appli Flak Alley",
+  "play": "Jouer maintenant dans votre navigateur",
+  "ios": "Télécharger dans l’App Store",
+  "iosSoon": "Bientôt sur l’App Store",
+  "android": "Disponible sur Google Play",
+  "androidSoon": "Bientôt sur Google Play",
+  "small": "Gratuit. Rien à installer pour la version navigateur.",
+  "dare": "Un ami a fait {score} points sur l’opération {name}. Ferez-vous mieux ?",
+  "dareWatch": "Un ami a fait {score} points sur l’opération {name} dans Flak Alley. Regardez le raid, puis tentez de faire mieux.",
+  "ops": {
+   "first-light": "Aube",
+   "dust-devil": "Tourbillon",
+   "iron-horse": "Cheval de fer",
+   "dry-well": "Puits sec",
+   "breakwater": "Brise-lames",
+   "olive-branch": "Rameau d’olivier",
+   "ferry-run": "Navette",
+   "switchback": "Lacets",
+   "long-shadow": "Longue ombre",
+   "strangle": "Garrot",
+   "roundhouse": "Rotonde",
+   "dog-green": "Dog Green",
+   "diver": "Diver",
+   "hedgerow": "Bocage",
+   "ski-jump": "Tremplin",
+   "crossroads": "Carrefour",
+   "broken-wing": "Aile brisée",
+   "corridor": "Plat pays",
+   "last-bridge": "Dernier pont",
+   "black-gold": "Or noir",
+   "cold-iron": "Fer froid",
+   "ice-road": "Route de glace",
+   "river-rats": "Passeur",
+   "iron-gate": "Porte de fer",
+   "pearl": "Battleship Row",
+   "shangri-la": "Shangri-La",
+   "five-minutes": "Cinq minutes",
+   "cactus": "Cactus",
+   "caldera": "Caldeira",
+   "black-sand": "Sable noir"
+  }
+ }
+};
+/*END WORDS*/
+// The visitor's language, if the game is in it; English otherwise.
+var lang = (function () {
+  var asked = (new URLSearchParams(location.search).get("lang") || "").toLowerCase(); // ?lang=vi shows the page in that language
+  if (WORDS[asked]) return asked;
+  var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"];
+  for (var i = 0; i < list.length; i++) { var code = String(list[i]).toLowerCase().split(/[-_]/)[0]; if (WORDS[code]) return code; }
+  return "en";
+})();
+var W = WORDS[lang] || {};
+var $ = function (id) { return document.getElementById(id); };
+var put = function (id, key) { if (W[key]) $(id).textContent = W[key]; };
+document.documentElement.lang = lang === "zh" ? "zh-Hans" : lang;
+if (W.title) document.title = W.title;
+put("tagline", "tagline"); put("blurb", "blurb"); put("watch", "watch"); put("app", "app"); put("web", "play");
+put("ios", "ios"); put("ios-soon", "iosSoon"); put("android", "android"); put("android-soon", "androidSoon"); put("small", "small");
+
+// The game is told the visitor came from this page (s=share), so arrivals from shared links can be counted.
+var q = function (parts) { return "?" + parts.filter(Boolean).join("&"); };
+$("web").href = WEB_GAME + q([challenge && "c=" + encodeURIComponent(challenge), "s=share"]);
+if (replay) {
+  $("watch").href = WEB_GAME + q(["r=" + replay, challenge && "c=" + encodeURIComponent(challenge), "s=share"]);
+  $("watch").hidden = false;
+  $("web").hidden = true;
+  if (APP_STORE && iOS) { $("app").href = "flakalley://r/" + replay; $("app").hidden = false; }
+}
+if (challenge) {
+  var parts = challenge.split("."), id = parts[0];
+  // the operation's name as the game shows it; an operation newer than this page gets its id, tidied
+  var name = (W.ops && W.ops[id]) || id.split("-").map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(" ");
+  var score = Number(parts[1]).toLocaleString(W.locale || "en");
+  var line = (replay ? W.dareWatch : W.dare) || (replay ? "A friend scored {score} on Operation {name} in Flak Alley. Watch the raid, then try to beat it." : "A friend scored {score} on Operation {name}. Can you beat it?");
+  $("dare").textContent = line.replace("{score}", score).replace("{name}", name);
+  $("dare").hidden = false;
+}
+if (APP_STORE) { $("ios").href = APP_STORE; $("ios").hidden = false; $("ios-soon").hidden = true; }
+if (GOOGLE_PLAY) { $("android").href = GOOGLE_PLAY; $("android").hidden = false; $("android-soon").hidden = true; }
+
+// One count for the game server: that the page was opened, what kind of link it was, and on what. Not sent where the
+// browser asks not to be tracked.
+(function () {
+  if (navigator.doNotTrack === "1" || navigator.globalPrivacyControl === true) return;
+  var body = JSON.stringify({ e: "landing", kind: replay ? "replay" : challenge ? "challenge" : "plain", plat: iOS ? "ios" : android ? "android" : "desk", lang: lang });
+  try { if (!(navigator.sendBeacon && navigator.sendBeacon(WEB_GAME + "api/e", body))) fetch(WEB_GAME + "api/e", { method: "POST", body: body, keepalive: true }); } catch (e) { /* the page works without it */ }
+})();
+</script>
+</body>
+</html>
